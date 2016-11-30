@@ -218,6 +218,147 @@ html.ie6 body #login {
 .foo .baz{
     height:10px;
 }
+```
+相对引用可以认为是带范围的部分引用的快捷方式类似`^[0..(N+1)]`这里`N`相对引用中的数字。(*总觉得不太对有些问题*)
+
+## 根引用
+
+`/`符号出现在选择器的开始被认为是一个根引用，它会引用根上下文，这意味着不会将父选择器添加到它上面(除非你和&一起使用).当你需要为默写嵌套选择器和另外的选择器写入一些样式时，它会很有帮助。
+
+```
+textarea
+input
+    color #A7A7A7
+    &:hover,
+    /.is-hovered
+        color #000
+```
+编译后:
+```
+textarea,
+inpu{
+    color:#a7a7a7;
+}
+
+textarea:hover,
+input:hover，
+.is-hovered{
+    color：#000
+}
+```
+
+## selector() 内置函数
+
+你可以使用内置函数`selector()`去获取当前编译的选择器。可以使用在混合书写中去做检查或者其他有趣的事情。
+```
+.foo
+    selector()
+//=>‘.foo'
+
+.foo
+    &：hover
+        selector()
+//'.foo:hover'
+```
+
+这个内置函数可以传入可选的字符串参数,这种情况下它会返回编译好的选择器。注意的是如果没有`&`符号的话，他将不受当前选择器作用域的影响。
+
+```
+.foo
+    selector('.bar')
+//=>'.bar'
+
+.foo
+    selector('&:hover')
+//’.foo:hover'
+```
+
+## 多参数值的selector内置函数
+
+selector()内置函数可以通过传入多参数值或逗号分隔的列表去更方便快捷的创建嵌套选择器。
+
+```
+{selector('.a','.b','.c,.d')}
+    color:red
+```
+等同于:
+```
+.a
+    .b
+        .c,
+        .d
+            color:red
+```
+它会被渲染为:
+```
+.a .b .c,
+.a .b .d{
+    color:#f00
+}
+```
+
+## selectors() 内置函数
+这个内置函数会返回当前层级的嵌入选择器的逗号列表分隔的内容。
+```
+.a
+    .b
+        &_c
+            content:selectors()
+```
+编译为:
+```
+.a .b_c{
+    content:'.a','& .b','&_c'
+}
+```
+
+## 消除分歧
+像`margin -n`这样的表达式中`-n`可能会被解释为一个减法运算，也可能解释成一个一元运算符，为了避免这种分歧，需要用括号包裹住表达式:
+
+```
+pad(n)
+    margin (-n)
+
+body
+    pad(5px)
+```
+编译为:
+```
+body{
+    margin:-5px;
+}
+```
+但是仅在函数中会这样(因为函数用返回值同时扮演着混合和回调)。
+
+下面这个例子，就是正常的（和上面一样的结果）:
+
+```
+body
+    margin -5px
+```
+
+如果有Stylus无法处理的属性值，那么`unquote`会帮到你:
+
+```
+filter unquote('progid:DXImageTransform.Microsoft.BasicImage(rotation=1)')
+```
+生成为:
+
+```
+filter progid:DXImageTransform.Microsoft.BasicImage(rotation=1)
+```
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
