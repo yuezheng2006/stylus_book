@@ -12,7 +12,7 @@ body
 body
     color:#fff
 ```
-如果你愿意，你也可以使用毛和来分隔属性和值:
+如果你愿意，你也可以使用毛和来分隔属性和值
 ```
 body
     color:white
@@ -24,7 +24,7 @@ Stylus也和CSS一样，允许你使用逗号分隔来为多个选择器定义�
 textarea,input
     border 1px solid #eee
 ```
-使用新行也是一样:
+使用新行也是一样
 ```
 textarea
 input
@@ -195,6 +195,30 @@ html.ie6 body #login {
 ```
 
 ## 相对引用
+以`../`符号开始的选择器被认为是一个相对引用，它会指向`&`符号之前的一层的选择器。你也可以使用嵌套的相对引用:`../../`来获取更深层次的引用，但是需要注意的是它仅可以被用在选择器的开始位置。
+
+```
+.foo
+    .bar
+        width:10
+    &,
+    ../ .baz
+        height:10px
+```
+将会渲染为:
+```
+.foo .bar{
+    width:10px;
+}
+
+.foo .bar{
+    width:10px;
+}
+.foo .bar,
+.foo .baz{
+    height:10px;
+}
+
 
 
 
